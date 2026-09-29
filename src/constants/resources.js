@@ -75,7 +75,7 @@ export const resources = {
       f("product", "Menu product", "relation", { resource: "products" }),
       f("ingredients", "Recipe ingredients", "ingredients"),
     ],
-    columns: ["product", "ingredients", "cost", "margin"],
+    columns: ["product", "ingredients", "sellingPrice", "cost", "grossProfit", "margin"],
   },
   customers: {
     title: "Customers",
@@ -87,7 +87,7 @@ export const resources = {
       f("email", "Email", "email"),
       f("notes", "Customer notes", "textarea"),
     ],
-    columns: ["name", "phone", "totalOrders", "totalSpend", "points"],
+    columns: ["name", "phone", "totalOrders", "totalSpend", "lastVisit", "points"],
   },
   staff: {
     title: "Staff",
@@ -103,7 +103,7 @@ export const resources = {
       f("password", "Password (10+ characters)", "password"),
       f("active", "Account enabled", "checkbox", { default: true }),
     ],
-    columns: ["name", "email", "role", "active"],
+    columns: ["name", "email", "role", "createdAt", "active"],
   },
   expenses: {
     title: "Expenses",

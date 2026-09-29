@@ -121,17 +121,20 @@ export default function Resources({ resource }) {
             `${i.ingredient?.name || "Deleted ingredient"} × ${i.quantity}${i.ingredient?.unit || ""}`,
         )
         .join(", ");
-    if (k === "cost" || k === "margin") {
+    if (['cost','margin','sellingPrice','grossProfit'].includes(k)) {
       const cost =
         r.ingredients?.reduce(
           (s, i) => s + i.quantity * (i.ingredient?.costPerUnit || 0),
           0,
         ) || 0;
+      if(k==='sellingPrice')return money(r.product?.price);
+      if(k==='grossProfit')return money((r.product?.price||0)-cost);
       return k === "cost"
         ? money(cost)
         : `${r.product?.price ? (((r.product.price - cost) / r.product.price) * 100).toFixed(1) : 0}%`;
     }
     if (k === "date") return new Date(r[k]).toLocaleDateString();
+    if(k==='lastVisit'||k==='createdAt')return r[k]?dateTime(r[k]):'—';
     return r[k] ?? "—";
   };
   const rowActions = (r) => (

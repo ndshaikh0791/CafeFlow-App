@@ -14,6 +14,8 @@ npm run demo
 
 Open **http://localhost:5173**. `setup-env.js` creates `.env` with a randomly generated JWT secret and seed password; it preserves an existing `.env`.
 
+On Windows, you can also double-click `Start-CafeFlow.cmd` after setup. Keep its terminal open while using the app; it runs the database, API, and frontend together. `/api/health` checks database connectivity and returns HTTP 503 when MongoDB is unavailable.
+
 | Role    | Email                    | Password                  |
 | ------- | ------------------------ | ------------------------- |
 | Owner   | `owner@cafeflow.local`   | `SEED_PASSWORD` in `.env` |
@@ -49,6 +51,8 @@ npm run dev:client
 ```
 
 `npm run demo` is an alternative to these commands, not an additional process to run alongside them.
+
+If the login screen shows HTTP 500 while only Vite is running, the API may be offline. Start the local database and API with `npm run demo -- --server-only` to reuse the existing frontend. For a fresh session, use `npm run demo` to start everything together.
 
 ## Environment variables
 

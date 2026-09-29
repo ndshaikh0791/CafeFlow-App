@@ -66,7 +66,8 @@ const server = spawn(process.execPath, ["server/index.js"], {
   stdio: "inherit",
   env: process.env,
 });
-const client = spawn(
+// Reuse an existing Vite process when only the local backend needs starting.
+const client = process.argv.includes("--server-only") ? null : spawn(
   process.execPath,
   ["node_modules/vite/bin/vite.js", "--host", "0.0.0.0"],
   { stdio: "inherit", env: process.env },
@@ -76,11 +77,11 @@ async function stop() {
   if (stopping) return;
   stopping = true;
   server.kill();
-  client.kill();
+  client?.kill();
   await repl.stop({ doCleanup: false });
   process.exit();
 }
 process.on("SIGINT", stop);
 process.on("SIGTERM", stop);
 server.on("exit", stop);
-client.on("exit", stop);
+client?.on("exit", stop);

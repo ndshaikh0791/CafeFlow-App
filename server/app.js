@@ -1,4 +1,5 @@
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
@@ -62,7 +63,20 @@ export function createApp(io) {
       return res.status(403).json({ error: "Untrusted request origin" });
     next();
   });
-  app.get("/api/health", (req, res) => res.json({ data: { status: "ok" } }));
+  app.get("/api/health", async (req, res) => {
+    try {
+      if (mongoose.connection.readyState !== 1) throw new Error("Database offline");
+      await mongoose.connection.db.admin().ping({ timeoutMS: 2000 });
+      res.json({ data: { status: "ok", database: "connected" } });
+    } catch {
+      res.status(503).json({ data: { status: "unavailable", database: "disconnected" } });
+    }
+  });
+  app.use("/api", (req, res, next) => {
+    if (mongoose.connection.readyState !== 1)
+      return res.status(503).json({ error: "Database is unavailable. Please start the database and try again." });
+    next();
+  });
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     limit: 30,
@@ -221,6 +235,8 @@ export function createApp(io) {
       return res
         .status(400)
         .json({ error: "Invalid record data or identifier" });
+    if (["MongoServerSelectionError", "MongooseServerSelectionError", "MongoNetworkError", "MongoNotConnectedError"].includes(err.name))
+      return res.status(503).json({ error: "Database is unavailable. Please start the database and try again." });
     if (!err.status) console.error(err);
     res.status(err.status || 500).json({
       error: err.status
